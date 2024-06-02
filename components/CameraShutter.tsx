@@ -44,6 +44,15 @@ export function CameraShutter({ setCapturedImageUri }: CameraProps) {
     setCapturedImageUri(manipResult.uri);
   };
 
+  const takePicture = async () => {
+    try {
+      const photo = await cameraRef.current?.takePictureAsync();
+      saveAndCropImage(photo);
+    } catch (error) {
+      throw error;
+    }
+  };
+
   return (
     <View style={styles.container}>
       <CameraView
@@ -59,11 +68,7 @@ export function CameraShutter({ setCapturedImageUri }: CameraProps) {
         }}
       >
         <View
-          style={{
-            backgroundColor: "#00000080",
-            width: "100%",
-            flex: 1,
-          }}
+          style={styles.overlay}
           onLayout={(event) => {
             const { height } = event.nativeEvent.layout;
             setCropHeights((prev) => ({
@@ -78,11 +83,7 @@ export function CameraShutter({ setCapturedImageUri }: CameraProps) {
           }}
         />
         <View
-          style={{
-            backgroundColor: "#00000080",
-            width: "100%",
-            flex: 1,
-          }}
+          style={styles.overlay}
           onLayout={(event) => {
             const { height } = event.nativeEvent.layout;
             setCropHeights((prev) => ({
@@ -91,24 +92,11 @@ export function CameraShutter({ setCapturedImageUri }: CameraProps) {
             }));
           }}
         />
-        <View
-          style={{
-            backgroundColor: "#00000080",
-            width: "100%",
-            height: bottom,
-          }}
-        />
+        <View style={[styles.overlayBottom, { height: bottom }]} />
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={[styles.button, { marginBottom: bottom }]}
-            onPress={async () => {
-              try {
-                const photo = await cameraRef.current?.takePictureAsync();
-                saveAndCropImage(photo);
-              } catch (error) {
-                throw error;
-              }
-            }}
+            onPress={takePicture}
           />
         </View>
       </CameraView>
@@ -138,5 +126,14 @@ const styles = StyleSheet.create({
     borderRadius: 32,
     borderWidth: 2,
     borderColor: "grey",
+  },
+  overlay: {
+    backgroundColor: "#00000080",
+    width: "100%",
+    flex: 1,
+  },
+  overlayBottom: {
+    backgroundColor: "#00000080",
+    width: "100%",
   },
 });
