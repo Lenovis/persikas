@@ -3,13 +3,12 @@ import { ThemedText } from "@/components/ThemedText";
 import { Link } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
-import { Alert, Dimensions, ScrollView, View } from "react-native";
+import { Alert, ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Index() {
   const db = useSQLiteContext();
   const [foodPics, setFoodPics] = useState<any[]>();
-  const dimensions = Dimensions.get("window");
   const { top, bottom } = useSafeAreaInsets();
 
   const result = db.getAllAsync<any>("SELECT * FROM foodPictures");
@@ -23,34 +22,18 @@ export default function Index() {
 
   return (
     <>
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          marginTop: top + 16,
-        }}
-      >
+      <View style={[styles.container, { marginTop: top + 16 }]}>
         {foodPics?.length ? (
           <ScrollView
-            style={{ width: "100%", flex: 1 }}
-            contentContainerStyle={{
-              flexGrow: 1,
-              gap: 16,
-            }}
+            style={[styles.flexOne, { width: "100%" }]}
+            contentContainerStyle={styles.scrollContainer}
           >
             {foodPics?.map((pic) => (
               <View key={pic.id}>
                 <FoodPicWithOverlay capturedImageUri={pic.uri} />
-                <View
-                  style={{
-                    flexDirection: "row",
-                    flex: 1,
-                    margin: 16,
-                  }}
-                >
+                <View style={styles.ctaButtonsWrapper}>
                   <ThemedText
-                    style={{ color: "black", flex: 1 }}
+                    style={[styles.flexOne, { color: "black" }]}
                     onPress={() => {
                       Alert.alert(
                         "Feature not implemented",
@@ -68,7 +51,6 @@ export default function Index() {
                           "DELETE FROM foodPictures WHERE id = ?",
                           [pic.id]
                         );
-                      // create alert with double check are you sure you want to delete
                       Alert.alert(
                         "Are you sure you want to delete this picture?",
                         "This action cannot be undone.",
@@ -94,41 +76,14 @@ export default function Index() {
             <View style={{ height: bottom + 16 }} />
           </ScrollView>
         ) : (
-          <ThemedText
-            style={{
-              fontSize: 24,
-              color: "black",
-              fontWeight: "bold",
-            }}
-          >
+          <ThemedText style={styles.disclaimerText}>
             No food pictures yet 😢
           </ThemedText>
         )}
       </View>
-      <View
-        style={{
-          alignSelf: "center",
-          position: "absolute",
-          bottom: bottom + 32,
-        }}
-      >
-        <View
-          style={{
-            backgroundColor: "#f97306",
-            alignSelf: "center",
-            justifyContent: "center",
-            height: 32,
-            paddingHorizontal: 16,
-            borderRadius: 16,
-          }}
-        >
-          <Link
-            href="/camera"
-            style={{
-              color: "white",
-              fontSize: 18,
-            }}
-          >
+      <View style={[styles.buttonContainer, { bottom: bottom + 32 }]}>
+        <View style={styles.linkButton}>
+          <Link href="/camera" style={styles.link}>
             Take a picture!
           </Link>
         </View>
@@ -136,3 +91,44 @@ export default function Index() {
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  flexOne: {
+    flex: 1,
+  },
+  link: {
+    color: "white",
+    fontSize: 18,
+  },
+  linkButton: {
+    backgroundColor: "#f97306",
+    alignSelf: "center",
+    justifyContent: "center",
+    height: 32,
+    paddingHorizontal: 16,
+    borderRadius: 16,
+  },
+  buttonContainer: {
+    position: "absolute",
+    alignSelf: "center",
+  },
+  disclaimerText: {
+    fontSize: 24,
+    color: "black",
+    fontWeight: "bold",
+  },
+  ctaButtonsWrapper: {
+    flexDirection: "row",
+    flex: 1,
+    margin: 16,
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    gap: 16,
+  },
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+});
