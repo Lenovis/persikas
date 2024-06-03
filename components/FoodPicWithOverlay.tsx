@@ -24,7 +24,7 @@ export function FoodPicWithOverlay({
         style={styles.linearGradient}
       />
       <Image
-        source={require("../assets/images/persikas.png")}
+        source={require("../assets/images/persikas.jpg")}
         style={styles.logo}
       />
       <View style={styles.textWrapper}>
